@@ -1,14 +1,21 @@
-from django.shortcuts import render
-from django.views.generic import ListView, DetailView
+# books/views.py
+from django.urls import reverse_lazy
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+)
 from .models import Book
 
 class BookListView(ListView):
     model = Book
-    template_name = 'books/book_list.html'  
+    template_name = "books/book_list.html"
 
 class BookDetailView(DetailView):
     model = Book
-    template_name = 'books/book_detail.html'
+    template_name = "books/book_detail.html"
 
 class BookCreateView(CreateView):
     model = Book
