@@ -10,4 +10,10 @@ urlpatterns = [
     path("books/<int:pk>/edit/", views.BookUpdateView.as_view(), name="edit"),
     path("books/<int:pk>/delete/", views.BookDeleteView.as_view(), name="delete"),
 
+    path("books/<int:book_pk>/reviews/add/", views.ReviewCreateView.as_view(), name="review_add"),
+    path("reviews/<int:pk>/edit/", views.ReviewUpdateView.as_view(), name="review_edit"),
+    path("reviews/<int:pk>/delete/", views.ReviewDeleteView.as_view(), name="review_delete"),
+
+    path("accounts/signup/", views.SignUpView.as_view(), name="signup"),
+
 ]
