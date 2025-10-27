@@ -4,6 +4,7 @@ from rest_framework import status, permissions
 from django.shortcuts import get_object_or_404
 from .models import Book, Review
 from .serializers import BookSerializer, ReviewSerializer
+from .permissions import IsOwnerOrReadOnly
 
 class BookListCreateView(APIView):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -22,17 +23,19 @@ class BookListCreateView(APIView):
 
 
 class BookDetailView(APIView):
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [IsOwnerOrReadOnly]
 
+    def get_object(self, pk):
+        return get_object_or_404(Book, pk=pk)
+    
     def get(self, request, pk):
         book = get_object_or_404(Book, pk=pk)
         serializer = BookSerializer(book)
         return Response(serializer.data)
 
     def put(self, request, pk):
-        book = get_object_or_404(Book, pk=pk)
-        if book.owner != request.user:
-            return Response({'detail': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+        book = self.get_object(pk)
+        self.check_object_permissions(request, book)
         serializer = BookSerializer(book, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
@@ -40,9 +43,8 @@ class BookDetailView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk):
-        book = get_object_or_404(Book, pk=pk)
-        if book.owner != request.user:
-            return Response({'detail': 'Not allowed'}, status=status.HTTP_403_FORBIDDEN)
+        book = self.get_object(pk)
+        self.check_object_permissions(request, book)
         book.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
