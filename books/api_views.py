@@ -1,6 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status, permissions
+from rest_framework import status, permissions, filters, viewsets
 from django.shortcuts import get_object_or_404
 from .models import Book, Review
 from .serializers import BookSerializer, ReviewSerializer
@@ -59,3 +59,10 @@ class ReviewCreateView(APIView):
             serializer.save(book=book, user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class BookViewSet(viewsets.ModelViewSet):
+    queryset = Book.objects.all().order_by('title')
+    serializer_class = BookSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title', 'author', 'description']
+
